@@ -7,6 +7,8 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk import download
 from pathlib import Path
+from nltk.tokenize import word_tokenize
+from app.naive_bayes import NaiveBayes
 
 # Descargar recursos de NLTK si no existen
 download('punkt')
@@ -14,22 +16,33 @@ download('stopwords')
 
 # === CONFIGURACIÓN ===
 DATASET_PATH = Path(__file__).resolve().parent.parent / 'static' / 'sentiment140.csv'
-MODEL_PATH = Path(__file__).resolve().parent.parent.parent / 'naive_bayes_model.pkl'
+MODEL_PATH = Path(__file__).resolve().parent / 'naive_bayes_model.pkl'
 
 # === PREPROCESAMIENTO ===
 def limpiar_texto(texto):
     texto = texto.lower()
     texto = re.sub(r"http\S+", "", texto)
     texto = re.sub(f"[{re.escape(string.punctuation)}]", "", texto)
-    tokens = word_tokenize(texto)
+    tokens = word_tokenize(texto, preserve_line=True)  # <- AÑADIDO preserve_line
     tokens = [t for t in tokens if t not in stopwords.words('english')]
     return tokens
 
 # === CARGAR DATASET ===
 def cargar_datos():
     df = pd.read_csv(DATASET_PATH, encoding='latin-1', header=None)
-    df = df[[0, 5]]
-    df.columns = ['label', 'text']
+
+    # Mostrar cuántas columnas tiene el archivo
+    print(f"Columnas detectadas en el archivo: {df.shape[1]}")
+    print(df.head())
+
+    if df.shape[1] >= 6:
+        df = df[[0, 5]]
+        df.columns = ['label', 'text']
+    elif df.shape[1] == 2:
+        df.columns = ['label', 'text']
+    else:
+        raise ValueError("❌ El archivo no tiene el formato esperado. Asegúrate de que contenga columnas para 'label' y 'text'.")
+
     df['label'] = df['label'].map({0: 'neg', 2: 'neu', 4: 'pos'})
     return df
 
