@@ -1,5 +1,5 @@
+import numpy as np
 from collections import defaultdict
-import math
 
 class NaiveBayes:
     def __init__(self):
@@ -28,11 +28,16 @@ class NaiveBayes:
     def predecir(self, tokens):
         resultados = {}
         V = len(self.vocabulario)
+        print(f"Tokens de entrada: {tokens}")
         for c in self.clases:
             log_prob = 0
             for palabra in tokens:
                 frecuencia = self.freq_palabra[c][palabra]
                 prob = (frecuencia + 1) / (self.total_palabras_clase[c] + V)
-                log_prob += math.log(prob)
-            resultados[c] = math.log(self.prior[c]) + log_prob
-        return max(resultados, key=resultados.get)
+                log_prob += np.log(prob)
+            resultados[c] = np.log(self.prior[c]) + log_prob
+            print(f"[{c}] Prior: {self.prior[c]:.4f}, Log Prob: {log_prob:.4f}, Total: {resultados[c]:.4f}")
+
+        pred = max(resultados, key=resultados.get)
+        print(f"Predicción final: {pred}")
+        return pred
