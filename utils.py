@@ -2,7 +2,7 @@ import csv
 from collections import Counter
 from preprocess import limpiar
 
-def cargar_dataset(ruta, limites={"positivo": 5000, "negativo": 5000, "neutro": 7500}):
+def cargar_dataset(ruta, limites={"positivo": 10000, "negativo": 10000, "neutro": 20000}):
     
     textos = []
     etiquetas = []

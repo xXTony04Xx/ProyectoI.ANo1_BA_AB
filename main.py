@@ -7,7 +7,7 @@ def main():
     print("Cargando dataset con énfasis en tweets neutros...")
     textos, etiquetas = cargar_dataset(
         "tweet_eval_sentiment.csv", 
-        limites={"positivo": 5000, "negativo": 5000, "neutro": 7500}
+        limites={"positivo": 10000, "negativo": 10000, "neutro": 20000}
     )
 
     # Mostrar distribución de clases y ejemplos representativos
@@ -35,15 +35,15 @@ def main():
     modelo.entrenar(textos, etiquetas)
 
     # 3. Pruebas con énfasis en casos neutros
-    print("\n✅ Modelo entrenado. Probando con casos límite:")
+    print("\nModelo entrenado. Probando con casos límite:")
     test_samples = [
         ("I love this product, it's amazing!", "positivo"),
         ("This is the worst experience ever", "negativo"),
         ("The service was okay, nothing special", "neutro"),
-        ("Estoy muy feliz con mi compra!", "positivo"),
-        ("No recomiendo este producto, muy mala calidad", "negativo"),
-        ("Voy a ver una película y luego cenar", "neutro"),
-        ("Este lugar está bien, pero nada impresionante", "neutro"),
+        ("I am very happy with my purchase!", "positivo"),
+        ("I do not recommend this product, very poor quality", "negativo"),
+        ("I'm going to watch a movie and then have dinner.", "neutro"),
+        ("This place is okay, but nothing impressive.", "neutro"),
         ("The meeting was at 3pm in the main office", "neutro"),  # Neutral objetivo
         ("It's neither good nor bad", "neutro"),  # Neutral explícito
         ("Just sharing some thoughts", "neutro"),  # Neutral implícito
@@ -54,18 +54,18 @@ def main():
     for sample, expected in test_samples:
         texto_limpio = limpiar(sample)
         prediccion = modelo.predecir(texto_limpio)
-        result = "✅" if prediccion == expected else "❌"
+        result = "ok" if prediccion == expected else "X"
         print(f"{result} Texto: '{sample[:50]}' → Predicción: {prediccion} (Esperado: {expected})")
-        if result == "✅":
+        if result == "ok":
             correct += 1
 
     print(f"\nPrecisión en pruebas: {correct/len(test_samples):.1%}")
 
     # 4. Modo interactivo con análisis de confianza
-    print("\n🔍 Modo interactivo (escribe 'salir' para terminar)")
+    print("\n Modo interactivo (escribe 'salir' para terminar)")
     print("El modelo ahora mostrará la confianza en cada predicción:")
     while True:
-        entrada = input("\n👉 Escribí tu tweet: ").strip()
+        entrada = input("\n Escribe tu mensaje aca: ").strip()
         if entrada.lower() == "salir":
             break
         if not entrada:
@@ -79,8 +79,8 @@ def main():
             prediccion = "neutro"
             print("🔍 El modelo no está seguro - clasificando como neutro por defecto")
         
-        print(f"\n🧠 Sentimiento detectado: {prediccion.upper()}")
-        print("Confianzas:")
+        print(f"\nSe ha detectado: {prediccion.upper()}")
+        print("Porcentajes:")
         for clase, prob in sorted(confianza.items(), key=lambda x: -x[1]):
             print(f"  {clase.capitalize()}: {prob:.1%}")
 
