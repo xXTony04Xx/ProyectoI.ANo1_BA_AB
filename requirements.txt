@@ -1,2 +1,5 @@
 flask
+nltk
+pandas
 numpy
+scikit-learn
